@@ -1,0 +1,28 @@
+# Java
+*.class
+
+# Git
+*.orig
+
+# Gradle
+.gradle
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+
+# Idea
+.idea/
+*.iml
+
+# Eclipse
+.classpath
+.project
+.settings
+./*/bin
+
+# Ubuntu
+*.swp
+
+# The install scripts download JDKs here
+tools/
