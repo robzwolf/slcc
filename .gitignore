@@ -26,3 +26,13 @@ gradle-app.setting
 
 # The install scripts download JDKs here
 tools/
+
+download.ps1
+install-jdk.ps1
+install-jdk.sh
+install.ps1
+PROPERTIES
+gradle.properties
+gradlew
+install.sh
+
