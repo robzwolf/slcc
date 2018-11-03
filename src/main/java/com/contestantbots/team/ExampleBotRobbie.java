@@ -23,7 +23,14 @@ public class ExampleBotRobbie extends Bot {
         gameStateLogger.process(gameState);
         List<Move> moves = new ArrayList<>();
         List<Position> nextPositions = new ArrayList<>();
-        assignedPlayerDestinations.clear();
+//        assignedPlayerDestinations.clear();
+        for (Player player : assignedPlayerDestinations.keySet()) {
+            Position targetDest = assignedPlayerDestinations.get(player);
+            if (targetDest == player.getPosition() || gameState.getRemovedPlayers().contains(player)) {
+                assignedPlayerDestinations.remove(player);
+            }
+        }
+        System.out.println("apd" + assignedPlayerDestinations.keySet().size());
 
         moves.addAll(doCollect(gameState, assignedPlayerDestinations, nextPositions));
         moves.addAll(doExplore(gameState, nextPositions));
@@ -32,7 +39,6 @@ public class ExampleBotRobbie extends Bot {
 
     private List<Move> doCollect(final GameState gameState, final Map<Player, Position> assignedPlayerDestinations, final List<Position> nextPositions) {
         List<Move> collectMoves = new ArrayList<>();
-        System.out.println(collectMoves.size() + " players collecting");
 
         Set<Position> collectablePositions = gameState.getCollectables().stream()
                 .map(collectable -> collectable.getPosition())
@@ -50,8 +56,6 @@ public class ExampleBotRobbie extends Bot {
             }
         }
 
-        System.out.println(collectableRoutes);
-
         for (Route route : collectableRoutes) {
             if (!assignedPlayerDestinations.containsKey(route.getPlayer())
                     && !assignedPlayerDestinations.containsValue(route.getDestination())) {
@@ -64,8 +68,7 @@ public class ExampleBotRobbie extends Bot {
         }
 
 
-        System.out.println("COLELCTMOGES SIZE)");
-        System.out.println(collectMoves.size());
+        System.out.println(collectMoves.size() + " players collecting");
 
         return collectMoves;
     }
