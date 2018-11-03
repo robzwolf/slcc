@@ -26,7 +26,7 @@ public class ExampleBotRobbie extends Bot {
 //        assignedPlayerDestinations.clear();
         for (Player player : assignedPlayerDestinations.keySet()) {
             Position targetDest = assignedPlayerDestinations.get(player);
-            if (targetDest == player.getPosition() || gameState.getRemovedPlayers().contains(player.getId())) {
+            if (targetDest == player.getPosition() || gameState.getRemovedPlayers().contains(player)) {
                 assignedPlayerDestinations.remove(player);
             }
         }
