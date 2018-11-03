@@ -11,6 +11,7 @@ import java.util.List;
 
 public class MemeBot extends Bot {
     private final GameStateLogger gameStateLogger;
+    private final long MaxTime = 4900000000L;
 
     public MemeBot() {
         super("Meme Bot");
@@ -19,7 +20,11 @@ public class MemeBot extends Bot {
 
     @Override
     public List<Move> makeMoves(final GameState gameState) {
+        long start = System.nanoTime();
         gameStateLogger.process(gameState);
+        while (System.nanoTime() - start <= MaxTime) {
+
+        }
         return new ArrayList<>();
     }
 
