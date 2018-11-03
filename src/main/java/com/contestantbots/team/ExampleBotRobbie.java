@@ -23,7 +23,7 @@ public class ExampleBotRobbie extends Bot {
         gameStateLogger.process(gameState);
         List<Move> moves = new ArrayList<>();
         List<Position> nextPositions = new ArrayList<>();
-
+        assignedPlayerDestinations.clear();
 
         moves.addAll(doCollect(gameState, assignedPlayerDestinations, nextPositions));
         moves.addAll(doExplore(gameState, nextPositions));
