@@ -13,7 +13,7 @@ public class MemeBot2 extends Bot {
     private final GameStateLogger gameStateLogger;
 
     public MemeBot2() {
-        super("Example Bot");
+        super("Meme Bot 2");
         gameStateLogger = new GameStateLogger(getId());
     }
 
