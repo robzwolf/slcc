@@ -57,7 +57,7 @@ private List<Move> doExplore(final GameState gameState) {
 
     exploreMoves.addAll(gameState.getPlayers().stream()
             .map(player -> new MoveImpl(player.getId(), Direction.NORTH))
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()));
     
     System.out.println(exploreMoves.size() + " players exploring");
     return exploreMoves;
