@@ -2,27 +2,78 @@ package com.contestantbots.team;
 
 import com.contestantbots.util.GameStateLogger;
 import com.scottlogic.hackathon.client.Client;
-import com.scottlogic.hackathon.game.Bot;
-import com.scottlogic.hackathon.game.GameState;
-import com.scottlogic.hackathon.game.Move;
+import com.scottlogic.hackathon.game.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class ExampleBotJames extends Bot {
+    static class MoveImpl implements Move {
+        private UUID playerId;
+        private Direction direction;
+        public MoveImpl(UUID playerId, Direction direction) {
+            this.playerId = playerId;
+            this.direction = direction;
+        }
+        @Override
+        public UUID getPlayer() {
+            return playerId;
+        }
+        @Override
+        public Direction getDirection() {
+            return direction;
+        }
+    }
+
     private final GameStateLogger gameStateLogger;
 
     public ExampleBotJames() {
-        super("Example Bot");
+        super("Example Bot James");
         gameStateLogger = new GameStateLogger(getId());
+    }
+
+    private boolean canMove(final GameState gameState, final List<Position> nextPositions, final Player player, final Direction direction) {
+        Set<Position> outOfBounds = gameState.getOutOfBoundsPositions();
+        Position newPosition = gameState.getMap().getNeighbour(player.getPosition(), direction);
+        if (!nextPositions.contains(newPosition)
+                && !outOfBounds.contains(newPosition)) {
+            nextPositions.add(newPosition);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private Move doMove(final GameState gameState, final List<Position> nextPositions, final Player player) {
+        List<Direction> directions = new ArrayList<>(Arrays.asList(Direction.values()));
+        Direction direction;
+        do {
+            direction = directions.remove(ThreadLocalRandom.current().nextInt(directions.size()));
+        } while (!directions.isEmpty() && !canMove(gameState, nextPositions, player, direction));
+        return new MoveImpl(player.getId(), direction);
+    }
+
+    private List<Move> doExplore(final GameState gameState, final List<Position> nextPositions) {
+        List<Move> exploreMoves = new ArrayList<>();
+
+        exploreMoves.addAll(gameState.getPlayers().stream()
+                .map(player -> doMove(gameState, nextPositions, player))
+                //.map(player -> new MoveImpl(player.getId(), Direction.NORTH))
+                .collect(Collectors.toList()));
+
+        System.out.println(exploreMoves.size() + " players exploring");
+        return exploreMoves;
     }
 
     @Override
     public List<Move> makeMoves(final GameState gameState) {
         gameStateLogger.process(gameState);
-        return new ArrayList<>();
+        List<Position> nextPositions = new ArrayList<>();
+        List<Move> moves = new ArrayList<>();
+        moves.addAll(doExplore(gameState, nextPositions));
+        return moves;
     }
-
 
     /*
      * Run this main as a java application to test and debug your code within your IDE.
