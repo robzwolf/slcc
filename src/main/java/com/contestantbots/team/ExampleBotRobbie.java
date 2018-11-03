@@ -11,8 +11,10 @@ import java.util.stream.Collectors;
 public class ExampleBotRobbie extends Bot {
     private final GameStateLogger gameStateLogger;
 
+    Map<Player, Position> assignedPlayerDestinations = new HashMap<>();
+
     public ExampleBotRobbie() {
-        super("Example Bot");
+        super("ExampleBotRobbie");
         gameStateLogger = new GameStateLogger(getId());
     }
 
@@ -21,8 +23,51 @@ public class ExampleBotRobbie extends Bot {
         gameStateLogger.process(gameState);
         List<Move> moves = new ArrayList<>();
         List<Position> nextPositions = new ArrayList<>();
+
+
+        moves.addAll(doCollect(gameState, assignedPlayerDestinations, nextPositions));
         moves.addAll(doExplore(gameState, nextPositions));
         return moves;
+    }
+
+    private List<Move> doCollect(final GameState gameState, final Map<Player, Position> assignedPlayerDestinations, final List<Position> nextPositions) {
+        List<Move> collectMoves = new ArrayList<>();
+        System.out.println(collectMoves.size() + " players collecting");
+
+        Set<Position> collectablePositions = gameState.getCollectables().stream()
+                .map(collectable -> collectable.getPosition())
+                .collect(Collectors.toSet());
+        Set<Player> players = gameState.getPlayers().stream()
+                .filter(player -> isMyPlayer(player))
+                .collect(Collectors.toSet());
+
+        List<Route> collectableRoutes = new ArrayList<>();
+        for (Position collectablePosition : collectablePositions) {
+            for (Player player : players) {
+                int distance = gameState.getMap().distance(player.getPosition(), collectablePosition);
+                Route route = new Route(player, collectablePosition, distance);
+                collectableRoutes.add(route);
+            }
+        }
+
+        System.out.println(collectableRoutes);
+
+        for (Route route : collectableRoutes) {
+            if (!assignedPlayerDestinations.containsKey(route.getPlayer())
+                    && !assignedPlayerDestinations.containsValue(route.getDestination())) {
+                Optional<Direction> direction = gameState.getMap().directionsTowards(route.getPlayer().getPosition(), route.getDestination()).findFirst();
+                if (direction.isPresent() && canMove(gameState, nextPositions, route.getPlayer(), direction.get())) {
+                    collectMoves.add(new MoveImpl(route.getPlayer().getId(), direction.get()));
+                    assignedPlayerDestinations.put(route.getPlayer(), route.getDestination());
+                }
+            }
+        }
+
+
+        System.out.println("COLELCTMOGES SIZE)");
+        System.out.println(collectMoves.size());
+
+        return collectMoves;
     }
 
     private boolean canMove(final GameState gameState, final List<Position> nextPositions, final Player player, final Direction direction) {
@@ -40,6 +85,7 @@ public class ExampleBotRobbie extends Bot {
 
         exploreMoves.addAll(gameState.getPlayers().stream()
                 .filter(player -> isMyPlayer(player))
+                .filter(player -> !assignedPlayerDestinations.containsKey(player))
                 .map(player -> doMove(gameState, nextPositions, player))
                 .collect(Collectors.toList()));
 
@@ -57,6 +103,9 @@ public class ExampleBotRobbie extends Bot {
         do {
             direction = directions.remove(ThreadLocalRandom.current().nextInt(directions.size()));
         } while (!directions.isEmpty() && !canMove(gameState, nextPositions, player, direction));
+//        if (directions.isEmpty()) {
+//            // Could not move
+//        }
         return new MoveImpl(player.getId(), direction);
     }
 
@@ -111,6 +160,30 @@ public class ExampleBotRobbie extends Bot {
         };
 
         Client.main(args);
+    }
+
+    static class Route implements Comparable<Route> {
+        private final Player player;
+        private final Position destination;
+        private final int distance;
+        public Route(Player player, Position destination, int distance) {
+            this.player = player;
+            this.destination = destination;
+            this.distance = distance;
+        }
+        public Player getPlayer() {
+            return player;
+        }
+        public Position getDestination() {
+            return destination;
+        }
+        public int getDistance() {
+            return distance;
+        }
+        @Override
+        public int compareTo(Route o) {
+            return distance - o.getDistance();
+        }
     }
 
     static class MoveImpl implements Move {
