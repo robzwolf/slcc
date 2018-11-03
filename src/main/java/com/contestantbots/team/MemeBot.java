@@ -70,7 +70,7 @@ public class MemeBot extends Bot {
                 "--debug",
 
                 // Use this class as the 'main' Bot
-                "--className", ExampleBot.class.getName()
+                "--className", MemeBot.class.getName()
         };
 
         Client.main(args);
