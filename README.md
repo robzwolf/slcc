@@ -123,8 +123,8 @@ players have a longer, and perhaps more prosperous, life.
 First things first, rename the Bot class so that there are no namespace clashes when uploading to the server,
 additionally you might want to change the display name which is shown when testing locally.  There are only a few
 restrictions on the compiled code:
-- the jar file must be < 20MB
-- the com.contestantbots.team package should only contain classes that extend `com.scottlogic.hackathon.game.Bot`
+- the `jar` file must be < 20MB
+- the `com.contestantbots.team` package should only contain classes that extend `com.scottlogic.hackathon.game.Bot`
 - any helper or utility classes should either be
   - inner classes of your Bot, or
   - not have a public constructor
